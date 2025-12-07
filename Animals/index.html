@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>动物配对记忆游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .game-container {
+            max-width: 400px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        .info-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card.matched {
+            background: rgba(144, 238, 144, 0.8);
+            animation: matchPulse 0.6s ease-in-out;
+        }
+        
+        @keyframes matchPulse {
+            0%, 100% { transform: rotateY(180deg) scale(1); }
+            50% { transform: rotateY(180deg) scale(1.1); }
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+        
+        .card-back {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+        }
+        
+        .card-front {
+            background: white;
+            color: #333;
+            transform: rotateY(180deg);
+        }
+        
+        .restart-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .restart-btn:active {
+            transform: translateY(0);
+        }
+        
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        .game-over h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #ffd93d;
+        }
+        
+        .game-over p {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 400px) {
+            .game-board {
+                gap: 8px;
+            }
+            
+            .card-face {
+                font-size: 28px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .game-info {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🐾 动物配对记忆游戏 🐾</h1>
+        
+        <div class="game-info">
+            <div class="info-item">⏱️ 时间: <span id="time">00:00</span></div>
+            <div class="info-item">🎯 步数: <span id="moves">0</span></div>
+            <div class="info-item">✅ 配对: <span id="matches">0</span>/8</div>
+        </div>
+        
+        <div class="game-board" id="gameBoard"></div>
+        
+        <button class="restart-btn" onclick="restartGame()">🔄 重新开始</button>
+    </div>
+    
+    <div class="game-over hidden" id="gameOver">
+        <h2>🎉 恭喜你赢了！ 🎉</h2>
+        <p>用时: <span id="finalTime">00:00</span></p>
+        <p>步数: <span id="finalMoves">0</span></p>
+        <button class="restart-btn" onclick="restartGame()">🎮 再玩一次</button>
+    </div>
+    
+    <script>
+        // 游戏数据
+        const animals = [
+            '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
+            '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'
+        ];
+        
+        let cards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        let time = 0;
+        let timerId = null;
+        let isProcessing = false;
+        
+        // DOM 元素
+        const gameBoard = document.getElementById('gameBoard');
+        const timeElement = document.getElementById('time');
+        const movesElement = document.getElementById('moves');
+        const matchesElement = document.getElementById('matches');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalTimeElement = document.getElementById('finalTime');
+        const finalMovesElement = document.getElementById('finalMoves');
+        
+        // 初始化游戏
+        function initGame() {
+            // 洗牌
+            const shuffledAnimals = [...animals].sort(() => Math.random() - 0.5);
+            
+            // 创建卡片
+            gameBoard.innerHTML = '';
+            cards = [];
+            
+            shuffledAnimals.forEach((animal, index) => {
+                const card = createCard(animal, index);
+                gameBoard.appendChild(card);
+                cards.push(card);
+            });
+            
+            // 重置游戏状态
+            matchedPairs = 0;
+            moves = 0;
+            time = 0;
+            flippedCards = [];
+            isProcessing = false;
+            
+            updateUI();
+            startTimer();
+        }
+        
+        // 创建卡片元素
+        function createCard(animal, index) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.animal = animal;
+            card.dataset.index = index;
+            
+            card.innerHTML = `
+                <div class="card-face card-back">?</div>
+                <div class="card-face card-front">${animal}</div>
+            `;
+            
+            card.addEventListener('click', () => flipCard(card));
+            
+            return card;
+        }
+        
+        // 翻转卡片
+        function flipCard(card) {
+            if (isProcessing || card.classList.contains('flipped') || card.classList.contains('matched')) {
+                return;
+            }
+            
+            card.classList.add('flipped');
+            flippedCards.push(card);
+            
+            if (flippedCards.length === 2) {
+                moves++;
+                updateUI();
+                checkMatch();
+            }
+        }
+        
+        // 检查配对
+        function checkMatch() {
+            isProcessing = true;
+            
+            const [card1, card2] = flippedCards;
+            
+            if (card1.dataset.animal === card2.dataset.animal) {
+                // 配对成功
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                updateUI();
+                flippedCards = [];
+                
+                // 检查游戏是否结束
+                if (matchedPairs === 8) {
+                    endGame();
+                }
+                
+                isProcessing = false;
+            } else {
+                // 配对失败，翻转回来
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    flippedCards = [];
+                    isProcessing = false;
+                }, 1000);
+            }
+        }
+        
+        // 更新UI
+        function updateUI() {
+            timeElement.textContent = formatTime(time);
+            movesElement.textContent = moves;
+            matchesElement.textContent = matchedPairs;
+        }
+        
+        // 格式化时间
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // 开始计时器
+        function startTimer() {
+            if (timerId) {
+                clearInterval(timerId);
+            }
+            
+            timerId = setInterval(() => {
+                time++;
+                updateUI();
+            }, 1000);
+        }
+        
+        // 结束游戏
+        function endGame() {
+            clearInterval(timerId);
+            
+            finalTimeElement.textContent = formatTime(time);
+            finalMovesElement.textContent = moves;
+            
+            gameOverElement.classList.remove('hidden');
+        }
+        
+        // 重新开始游戏
+        function restartGame() {
+            gameOverElement.classList.add('hidden');
+            initGame();
+        }
+        
+        // 初始化游戏
+        initGame();
+    </script>
+</body>
+</html>
