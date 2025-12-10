@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>英语单词记忆游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎮 英语单词记忆 🎮</h1>
+        
+        <div class="game-info">
+            <div class="score">得分: <span id="score">0</span></div>
+            <div class="question-count">题目: <span id="questionCount">0/10</span></div>
+        </div>
+        
+        <!-- Tab切换按钮 -->
+        <div class="tab-container">
+            <button class="tab-btn active" data-mode="word-to-image">📝 单词选图片</button>
+            <button class="tab-btn" data-mode="image-to-word">🖼️ 图片选单词</button>
+        </div>
+        
+        <!-- 游戏区域 -->
+        <div class="game-area">
+            <!-- 题目显示区域 -->
+            <div class="question-section">
+                <div id="questionWord" class="question-item word-question">
+                    <!-- 单词题目 -->
+                </div>
+                <div id="questionImage" class="question-item image-question hidden">
+                    <!-- 图片题目 -->
+                </div>
+                <button id="soundBtn" class="sound-btn">🔊 听发音</button>
+            </div>
+            
+            <!-- 选项区域 -->
+            <div class="options-section">
+                <div class="options-grid" id="optionsGrid">
+                    <!-- 选项将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <!-- 结果反馈 -->
+            <div id="feedback" class="feedback hidden">
+                <div class="feedback-content"></div>
+            </div>
+            
+            <!-- 控制按钮 -->
+            <div class="game-controls">
+                <button id="startBtn" class="primary-btn">开始游戏</button>
+                <button id="nextBtn" class="secondary-btn hidden">下一题</button>
+                <button id="restartBtn" class="secondary-btn">重新开始</button>
+            </div>
+        </div>
+        
+        <!-- 游戏结束界面 -->
+        <div id="gameOver" class="game-over hidden">
+            <h2>🎉 恭喜完成！ 🎉</h2>
+            <div class="final-stats">
+                <p>最终得分: <span id="finalScore">0</span></p>
+                <p>正确率: <span id="accuracy">0%</span></p>
+                <p>总题目数: <span id="totalQuestions">10</span></p>
+            </div>
+            <button id="playAgainBtn" class="primary-btn">再玩一次</button>
+        </div>
+        
+        <!-- 游戏说明 -->
+        <div class="game-help">
+            <h3>🎯 游戏玩法：</h3>
+            <p>1. 选择游戏模式：单词选图片或图片选单词</p>
+            <p>2. 点击喇叭按钮听单词发音</p>
+            <p>3. 从4个选项中选择正确答案</p>
+            <p>4. 完成10道题获得最终得分</p>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
