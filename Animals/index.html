@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <script>
+        (function() {
+          // 维护路径映射：小写路径 → 原大小写路径
+          const pathMap = {
+            '/kids/animals/index.html': '/Kids/Animals/index.html',
+            '/kids/englishpairs': '/Kids/EnglishPairs',
+            '/kids/englishwordgame': '/Kids/EnglishWordGame',
+            '/apptest/tsp_ga/index.html': '/APPTest/TSP_GA/index.html'
+          };
+        
+          const lowerPath = window.location.pathname.toLowerCase();
+          // 若映射表中存在该小写路径，重定向到原路径
+          if (pathMap[lowerPath]) {
+            window.location.href = window.location.origin + pathMap[lowerPath] + window.location.search + window.location.hash;
+          }
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>动物配对记忆游戏</title>
